@@ -8,7 +8,9 @@ import noteRoutes from './presentation/routes/note.routes.js';
 import authRoutes from './presentation/routes/auth.routes.js';
 import { connectMongo } from './infrastructure/database/mongo/connection.js';
 import { connectMysql } from './infrastructure/database/mysql/connection.js';
- 
+import dns from "node:dns/promises";
+dns.setServers(["1.1.1.1"]); 
+
 await connectMongo();
 await connectMysql();
  
