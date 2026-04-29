@@ -16,9 +16,49 @@ const noteService = new NoteService(noteRepository, mailService);
 const noteController = new NoteController(noteService);
 
 const router = Router();
+ 
 
-// Definir las rutas para las notas  
+/*
+ * @swagger
+ * /notes:
+ * post:
+ * summary: Crear una nueva nota
+ * tags: [Notes]
+ * security:
+ * - bearerAuth: []
+ * requestBody:
+ * required: true
+ * content:
+ * multipart/form-data:
+ * schema:
+ * type: object
+ * properties:
+ * title:
+ * type: string
+ * content:
+ * type: string
+ * image:
+ * type: string
+ * format: binary
+ * responses:
+ * 201:
+ * description: Nota creada exitosamente
+ */
 router.post("/", authMiddleware, upload.single('image'), noteController.createNote);
+/*
+ * @swagger
+ * /notes:
+ * get:
+ * summary: Obtener todas las notas del usuario autenticado
+ * tags: [Notes]
+ * security:
+ * - bearerAuth: []
+ * responses:
+ * 200:
+ * description: Lista de notas obtenida exitosamente
+ * 401:
+ * description: No autorizado, token faltante o inválido
+ */
 router.get("/", authMiddleware, noteController.getNotesByUserId);
 router.put("/:id", authMiddleware, upload.single('image'), noteController.updateNote);
 router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), noteController.deleteNote);
