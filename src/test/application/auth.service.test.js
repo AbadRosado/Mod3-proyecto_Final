@@ -1,8 +1,9 @@
 //import authService from '../../src/application/auth.service.js';
 
-import AuthService from "../../application/auth.service.js";
+import AuthService from "../../application/use-cases/auth.service.js";
 import hashService from "../../infrastructure/security/hash.service.js";
 import jwtService from "../../infrastructure/security/jwt.service.js";
+import { jest } from '@jest/globals';
  
 /** Mock del repositorio de usuarios */
 const mockUserRepository = {
