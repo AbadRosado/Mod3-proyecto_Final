@@ -13,7 +13,7 @@ export default class NoteService {
         const note = new NoteEntity(data);
         return await this.noteRepository.save(note);
     }
-
+// ejercicio nro 3
 async getPublicNotes(id) {
     const note = await this.noteRepository.findById(id);
     if (!note) throw new Error("Note not found");

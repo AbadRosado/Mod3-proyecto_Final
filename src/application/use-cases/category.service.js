@@ -11,7 +11,7 @@ export default class categoryService {
     //     return category.userId === currentUser.id || currentUser.role === 'admin';
     //}
     async createCategory(data) {
-        if (!data.title) throw new Error("Title is required");
+        if (!data.name) throw new Error("Name is required");
         const category = new categoryEntity(data);
         return await this.categoryRepository.save(category);
     }
