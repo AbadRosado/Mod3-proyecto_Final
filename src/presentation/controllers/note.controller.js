@@ -25,6 +25,17 @@ export default class NoteController {
         }
     }
 
+getPublicNotes = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const note = await this.noteService.getPublicNotes(id);
+        res.status(200).json(note);
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+}
+
     updateNote = async (req, res) => {
         const { id } = req.params;
         const data = req.body;

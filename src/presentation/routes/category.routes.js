@@ -1,29 +1,29 @@
 import { Router } from "express";
-import NoteController from "../controllers/note.controller.js";
-import NoteService from "../../application/use-cases/note.service.js";
+import categoryController from "../controllers/category.controller.js";
+import categoryService from "../../application/use-cases/category.service.js";
 import  upload  from "../middlewares/upload.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../middlewares/role.middleware.js";
 
 // Importamos el repositorio de MySQL y el servicio de Mail
-import NoteMySQLRepository from "../../infrastructure/database/mysql/note.mysql.repository.js";
+import categoryMySQLRepository from "../../infrastructure/database/mysql/category.mysql.repository.js";
 import MailService from "../../infrastructure/services/mail.service.js";
 
 // inyeccion de dependencias
 const mailService = new MailService();
-const noteRepository = new NoteMySQLRepository();
-const noteService = new NoteService(noteRepository, mailService);
-const noteController = new NoteController(noteService);
+const categoryRepository = new CategoryMySQLRepository();
+const categoryService = new categoryService(categoryRepository, mailService);
+const categoryController = new categoryController(categoryService);
 
 const router = Router();
  
 
 /**
  * @swagger
- * /notes:
+ * /categories:
  *   post:
- *     summary: Crear una nueva nota
- *     tags: [Notes]
+ *     summary: Crear una nueva categoría
+ *     tags: [Categorías]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -45,7 +45,7 @@ const router = Router();
  *                 format: binary
  *     responses:
  *       201:
- *         description: Nota creada exitosamente
+ *         description: Tarea creada exitosamente
  *         content:
  *           application/json:
  *             schema:
@@ -64,18 +64,18 @@ const router = Router();
  *       400:
  *         description: Título o contenido faltante
  */
-router.post("/", authMiddleware, upload.single('image'), noteController.createNote);
+router.post("/", authMiddleware, upload.single('image'), categoryController.createCategory);
 /**
  * @swagger
- * /notes:
+ * /categories:
  *   get:
- *     summary: Obtener todas las notas del usuario autenticado
- *     tags: [Notes]
+ *     summary: Obtener todas las categorías del usuario autenticado
+ *     tags: [Categorías]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Lista de notas obtenida exitosamente
+ *         description: Lista de categorías obtenida exitosamente
  *         content:
  *           application/json:
  *             schema:
@@ -92,21 +92,50 @@ router.post("/", authMiddleware, upload.single('image'), noteController.createNo
  *       401:
  *         description: No autorizado (Token faltante o inválido)
  */
-router.get("/", authMiddleware, noteController.getNotesByUserId);
+router.get("/", authMiddleware, categoryController.getCategoriesByUserId);
 
 /**
  * @swagger
- * /notes/{id}:
+ * /categories/{id}:
+ *   get:
+ *     summary: Obtener todas las categorías del usuario autenticado
+ *     tags: [Categorías]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de categorías obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       401:
+ *         description: No autorizado (Token faltante o inválido)
+ */
+router.get("/:id", authMiddleware, categoryController.getCategoriesById);
+
+/**
+ * @swagger
+ * /categories/{id}:
  *   put:
- *     summary: Actualizar una nota existente
- *     tags: [Notes]
+ *     summary: Actualizar una categoría existente
+ *     tags: [Categorías]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID único de la nota
+ *         description: ID único de la categoría
  *         schema:
  *           type: string
  *     requestBody:
@@ -124,18 +153,18 @@ router.get("/", authMiddleware, noteController.getNotesByUserId);
  *                 format: binary
  *     responses:
  *       200:
- *         description: Nota actualizada exitosamente
+ *         description: Categoría actualizada exitosamente
  *       404:
- *         description: Nota no encontrada
+ *         description: Categoría no encontrada
  */
-router.put("/:id", authMiddleware, upload.single('image'), noteController.updateNote);
+router.put("/:id", authMiddleware, categoryController.updateCategory);
 
 /**
  * @swagger
- * /notes/{id}:
+ * /categories/{id}:
  *   delete:
- *     summary: Eliminar una nota (Solo Admins)
- *     tags: [Notes]
+ *     summary: Eliminar una categoría (Solo Admins)
+ *     tags: [Categorías]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -146,7 +175,7 @@ router.put("/:id", authMiddleware, upload.single('image'), noteController.update
  *           type: string
  *     responses:
  *       200:
- *         description: Nota eliminada
+ *         description: Categoría eliminada
  *         content:
  *           application/json:
  *             schema:
@@ -154,20 +183,20 @@ router.put("/:id", authMiddleware, upload.single('image'), noteController.update
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Note deleted successfully"
+ *                   example: "Categoría eliminada exitosamente"
  *       403:
  *         description: Acceso denegado (Requiere rol admin)
  *       404:
- *         description: Nota no encontrada
+ *         description: Categoría no encontrada
  */
-router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), noteController.deleteNote);
+router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), categoryController.deleteCategory);
 
 /**
  * @swagger
- * /notes/{id}/share:
+ * /categories/{id}/share:
  *   post:
- *     summary: Compartir una nota por email
- *     tags: [Notes]
+ *     summary: Compartir una categoría por email
+ *     tags: [Categorías]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -200,10 +229,8 @@ router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), noteController.
  *                   type: string
  *                   example: "Email sent successfully"
  *       400:
- *         description: No se pudo enviar el correo o no es dueño de la nota
+ *         description: No se pudo enviar el correo o no es dueño de la categoría
  */
-router.post("/:id/share", authMiddleware, noteController.shareNote);
-
-router.get("/:id/public", noteController.getPublicNotes);
+router.post("/:id/share", authMiddleware, categoryController.shareCategory);
 
 export default router;
