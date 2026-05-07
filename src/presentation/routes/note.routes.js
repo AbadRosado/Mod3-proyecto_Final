@@ -204,6 +204,33 @@ router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), noteController.
  */
 router.post("/:id/share", authMiddleware, noteController.shareNote);
 
+/**
+ * @swagger
+ * /notes/{id}/public:
+ *   get:
+ *     summary: Obtener una nota pública sin token (Solo notas no privadas)
+ *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de notas obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       401:
+ *         description: No autorizado (Token faltante o inválido)
+ */
 router.get("/:id/public", noteController.getPublicNotes);
 
 export default router;

@@ -32,6 +32,9 @@ getPublicNotes = async (req, res) => {
         const note = await this.noteService.getPublicNotes(id);
         res.status(200).json(note);
     } catch (error) {
+        if (error.message.includes("Acceso no Autorizado")) {
+            return res.status(404).json({ error: error.message });
+        }
         res.status(404).json({ error: error.message });
     }
 }
